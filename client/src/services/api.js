@@ -1,136 +1,60 @@
-// api.js - API service for making requests to the backend
-
 import axios from 'axios';
 
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-// Add request interceptor for authentication
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle authentication errors
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Post API services
-export const postService = {
-  // Get all posts with optional pagination and filters
-  getAllPosts: async (page = 1, limit = 10, category = null) => {
-    let url = `/posts?page=${page}&limit=${limit}`;
-    if (category) {
-      url += `&category=${category}`;
-    }
-    const response = await api.get(url);
-    return response.data;
-  },
-
-  // Get a single post by ID or slug
-  getPost: async (idOrSlug) => {
-    const response = await api.get(`/posts/${idOrSlug}`);
-    return response.data;
-  },
-
-  // Create a new post
-  createPost: async (postData) => {
-    const response = await api.post('/posts', postData);
-    return response.data;
-  },
-
-  // Update an existing post
-  updatePost: async (id, postData) => {
-    const response = await api.put(`/posts/${id}`, postData);
-    return response.data;
-  },
-
-  // Delete a post
-  deletePost: async (id) => {
-    const response = await api.delete(`/posts/${id}`);
-    return response.data;
-  },
-
-  // Add a comment to a post
-  addComment: async (postId, commentData) => {
-    const response = await api.post(`/posts/${postId}/comments`, commentData);
-    return response.data;
-  },
-
-  // Search posts
-  searchPosts: async (query) => {
-    const response = await api.get(`/posts/search?q=${query}`);
-    return response.data;
-  },
+export const loginUser = async (email, password) => {
+  // TODO: Replace with your backend login endpoint
+  const res = await axios.post(`${API_BASE}/auth/login`, { email, password });
+  return res.data;
 };
 
-// Category API services
-export const categoryService = {
-  // Get all categories
-  getAllCategories: async () => {
-    const response = await api.get('/categories');
-    return response.data;
-  },
-
-  // Create a new category
-  createCategory: async (categoryData) => {
-    const response = await api.post('/categories', categoryData);
-    return response.data;
-  },
+export const registerUser = async (name, email, password) => {
+  // TODO: Replace with your backend register endpoint
+  const res = await axios.post(`${API_BASE}/auth/register`, { name, email, password });
+  return res.data;
 };
 
-// Auth API services
-export const authService = {
-  // Register a new user
-  register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  },
-
-  // Login user
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
-  },
-
-  // Logout user
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
-
-  // Get current user
-  getCurrentUser: () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
-  },
+// Blog post APIs
+export const getPosts = async (page = 1, limit = 5, search = '') => {
+  const params = new URLSearchParams({ page, limit });
+  if (search) params.append('search', search);
+  const res = await axios.get(`${API_BASE}/posts?${params.toString()}`);
+  return res.data;
 };
 
-export default api; 
+export const getPost = async (id) => {
+  const res = await axios.get(`${API_BASE}/posts/${id}`);
+  return res.data;
+};
+
+export const createPost = async (post) => {
+  const res = await axios.post(`${API_BASE}/posts`, post);
+  return res.data;
+};
+
+export const updatePost = async (id, post) => {
+  const res = await axios.put(`${API_BASE}/posts/${id}`, post);
+  return res.data;
+};
+
+export const deletePost = async (id) => {
+  const res = await axios.delete(`${API_BASE}/posts/${id}`);
+  return res.data;
+};
+
+export const getComments = async (postId) => {
+  const res = await axios.get(`/api/comments/${postId}`);
+  return res.data;
+};
+
+export const createComment = async (postId, comment) => {
+  const res = await axios.post(`/api/comments/${postId}`, comment);
+  return res.data;
+};
+
+// You can add more API functions here (getPosts, createPost, etc.) 
+
+export const createCategory = async (newCategory) => {
+  const res = await axios.post(`${API_BASE}/categories`, { name: newCategory });
+  return res.data;
+}; 
