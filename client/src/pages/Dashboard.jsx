@@ -248,7 +248,7 @@ const Dashboard = () => {
               ))
             )}
           </div>
-          {/* Pagination controls */}
+
           <div className="flex justify-center items-center gap-2 mt-8">
             <button
               onClick={handlePrev}
