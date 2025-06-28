@@ -1,7 +1,3 @@
-Of course, hun — here’s your updated `README.md` with a lovely **Screenshots** section neatly tucked in, right after the Project Overview 🌸:
-
----
-
 ```markdown
 # 📝 BlogSphere – A MERN Stack Blogging Platform
 
